@@ -1,0 +1,11 @@
+[
+  {
+    "id": 2,
+    "title": "AlgoNuevo2",
+    "description": "DescriptionNueva",
+    "price": 3000,
+    "thumbnail": "rutaNueva.img",
+    "code": "codigoDeVerificacionNuevo",
+    "stock": 15
+  }
+]
