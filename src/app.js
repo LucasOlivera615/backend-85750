@@ -1,4 +1,9 @@
 import express from 'express'
+import { engine } from 'express-handlebars'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import http from 'http'
+import { Server } from 'socket.io'
 import ProductManager from './managers/ProductManager.js'
 import CartManager from './managers/CartManager.js'
 
@@ -6,8 +11,13 @@ const app = express()
 const PORT = 8080
 const manager = new ProductManager('./src/data/products.json')
 const cManager = new CartManager('./src/data/carts.json')
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 app.use(express.json())
+app.engine('handlebars', engine())
+app.set('view engine', 'handlebars')
+app.set('views', path.join(__dirname, 'views'))
 
 app.get('/', (req, res) => {
   res.send('Servidor funcionando')
@@ -40,6 +50,16 @@ app.get('/api/carts/:cid', async (req, res) => {
 
   res.json(cart.products)
 
+})
+
+app.get('/home', async (req, res) => {
+  const products = await manager.getProducts()
+  res.render('home', { products })
+})
+
+app.get('/realtimeproducts', async (req, res) => {
+  const products = await manager.getProducts()
+  res.render('realTimeProducts', { products })
 })
 
 app.post('/api/products', async (req, res) => {
@@ -110,6 +130,32 @@ app.delete('/api/products/:pid', async (req, res) => {
   res.json({ message: 'Producto eliminado correctamente' })
 })
 
-app.listen(PORT, () => {
-  console.log(`Servidor escuchando en puerto ${PORT}`)
+const server = http.createServer(app)
+const io = new Server(server)
+
+io.on('connection', async (socket) => {
+  console.log('Cliente conectado.')
+
+  const products = await manager.getProducts()
+  socket.emit('products', products)
+
+  socket.on('newProduct', async (productData) => {
+    await manager.addProduct(productData)
+
+    const updatedProducts = await manager.getProducts()
+
+    io.emit('products', updatedProducts)
+  })
+
+  socket.on('deleteProduct', async (id) => {
+    await manager.deleteProduct(id)
+
+    const updatedProducts = await manager.getProducts()
+
+    io.emit('products', updatedProducts)
+  })
+})
+
+server.listen(PORT, () => {
+  console.log(`Server escuchando en el puerto ${PORT}`)
 })

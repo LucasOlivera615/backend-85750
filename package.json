@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/LucasOlivera615/backend-85750#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "express-handlebars": "^8.0.3",
+    "socket.io": "^4.8.3"
   }
 }
