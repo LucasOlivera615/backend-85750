@@ -10,58 +10,99 @@
             box-sizing: border-box;
         }
 
-        .contenedor {
-            display: flex;
-            width: 100%;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .subContenedor {
-            width: 50%;
-            text-align: center;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-        }
-
         h1 {
             text-align: center;
             text-decoration: underline;
         }
 
-        h2 {
-            text-align: start;
+        .products-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            width: 80%;
+            margin: auto;
         }
 
-        .contenedorFormulario {
-            display: flex;
-            width: 100%;
-            justify-content: center;
-            align-items: center;
+        .product-card {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .formulario {
+        .price {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .btn-detail {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #54687e;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .btn-detail:hover {
+            background: #0056b3;
+        }
+
+        .product-detail {
+            width: 40%;
+            margin: auto;
+            text-align: center;
+        }
+
+        .btn-cart {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-cart:hover {
+            background: #1f7a33;
+        }
+
+        .pagination {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .btn-page {
+            margin: 10px;
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: #333;
+            color: white;
+        }
+
+        .cart-container {
             width: 50%;
+            margin: auto;
+        }
+
+        .cart-item {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
         }
-        input {
-            width: 100%;
-            margin-right: 10px;
-            padding: 4px;
-            border-radius: 10px;
+
+        .cart-title {
+            font-weight: bold;
         }
-        button {
-            width: 70px;
-            padding: 4px;
-            border-radius: 10px;
-        }
-        li {
+
+        .cart-total {
             margin-top: 20px;
+            font-size: 18px;
         }
     </style>
 </head>

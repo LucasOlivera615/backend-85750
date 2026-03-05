@@ -1,83 +1,93 @@
-import fs from 'fs'
+import Cart from "../models/Cart.js"
 
 class CartManager {
 
-    constructor(path) {
-        this.path = path
-    }
-
-    async getCarts() {
-
-        try {
-            const data = await fs.promises.readFile(this.path, 'utf-8')
-            return JSON.parse(data)
-
-        } catch (error) {
-            return []
-        }
-
-    }
-
     async createCart() {
-
-        const carts = await this.getCarts()
-
-        const newId = carts.length === 0 ? 1 : carts[carts.length - 1].id + 1
-
-        const newCart = {
-            id: newId,
-            products: []
-        }
-
-        carts.push(newCart)
-
-        await fs.promises.writeFile(
-            this.path,
-            JSON.stringify(carts, null, 2)
-        )
-
-        return newCart
-
+        const newCart = new Cart({ products: [] })
+        return await newCart.save()
     }
 
     async getCartById(id) {
-
-        const carts = await this.getCarts()
-        return carts.find ( cart => cart.id === id )
-
+        return await Cart.findById(id).populate("products.product")
     }
 
-    async addProductToCart(cartId, productId) {
+    async addProductToCart(cid, pid) {
 
-        const carts = await this.getCarts()
-        const cartIndex = carts.findIndex( c => c.id === cartId )
+        const cart = await Cart.findById(cid)
+        if (!cart) return null
 
-        if (cartIndex === -1) return null
+        const existingProduct = cart.products.find(
+            p => p.product.toString() === pid
+        )
 
-        const cart = carts[cartIndex]
-
-        const productInCart = cart.products.find ( p => p.product === productId )
-
-        if (productInCart) {
-            
-            productInCart.quantity += 1        
-    
+        if (existingProduct) {
+            existingProduct.quantity++
         } else {
             cart.products.push({
-                product: productId,
+                product: pid,
                 quantity: 1
             })
         }
 
-        carts[cartIndex] = cart
+        await cart.save()
 
-        await fs.promises.writeFile (
-            this.path,
-            JSON.stringify(carts, null, 2)
+        return cart
+    }
+
+    async removeProductFromCart(cid, pid) {
+
+        const cart = await Cart.findById(cid)
+
+        if (!cart) {
+            throw new Error("Carrito no encontrado")
+        }
+
+        cart.products = cart.products.filter(
+            p => p.product.toString() !== pid
+        )
+
+        return await cart.save()
+    }
+
+    async updateCart(cid, products) {
+
+        const cart = await Cart.findByIdAndUpdate(
+            cid,
+            { products },
+            { new: true }
         )
 
         return cart
+    }
 
+    async updateProductQuantity(cid, pid, quantity) {
+
+        const cart = await Cart.findById(cid)
+
+        const product = cart.products.find(
+            p => p.product.toString() === pid
+        )
+
+        if (!product) {
+            throw new Error("Producto no encontrado en el carrito")
+        }
+
+        product.quantity = quantity
+
+        return await cart.save()
+    }
+
+    async clearCart(cid) {
+
+        const cart = await Cart.findById(cid)
+
+        cart.products = []
+
+        return await cart.save()
+    }
+
+    async getCarts() {
+        return await Cart.find()
     }
 
 }
